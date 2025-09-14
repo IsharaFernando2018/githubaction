@@ -26,15 +26,12 @@ jobs:
       - name: Detect Changed Services
         id: changes
         run: |
-          # Get list of top-level dirs that changed
-          # CHANGED_DIRS=$(git diff --name-only HEAD~1 HEAD | cut -d/ -f1 | sort -u)
           CHANGED_DIRS=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git ls-tree --name-only -d HEAD)
+          # Filter only Project-01 subdirectories
+          CHANGED_DIRS=$(echo $CHANGED_DIRS | grep '^Project-01/' | cut -d/ -f2 | sort -u)
+          # Convert to comma-separated list for safe output
           CHANGED_DIRS=$(echo $CHANGED_DIRS | tr ' ' ',')
-
           echo "Changed dirs: $CHANGED_DIRS"
-          echo "changed=$CHANGED_DIRS" >> $GITHUB_OUTPUT
-
-          # Save for later steps
           echo "changed=$CHANGED_DIRS" >> $GITHUB_OUTPUT
 
       - name: Build & Push Images
