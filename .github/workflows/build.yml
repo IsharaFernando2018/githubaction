@@ -45,7 +45,7 @@ jobs:
 
               # Update Helm values.yaml if chart exists
               if [ -f "helm-charts/$svc/values.yaml" ]; then
-                sed -i "s|repository:.*|repository: ${{ secrets.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/$svc|g" helm-charts/$svc/values.yaml
+                sed -i "s|repository:.*|repository: ${{ secrets.DOCKER_USERNAME }}/$svc|g" helm-charts/$svc/values.yaml
                 sed -i "s|tag:.*|tag: ${GITHUB_SHA::7}|g" helm-charts/$svc/values.yaml
               fi
             fi
