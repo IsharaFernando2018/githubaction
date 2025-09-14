@@ -36,17 +36,20 @@ jobs:
 
       - name: Build & Push Images
         run: |
-          for svc in ${{ steps.changes.outputs.changed }}; do
-            if [ -f "$svc/Dockerfile" ]; then
-              IMAGE="${{ secrets.DOCKER_USERNAME }}/$svc:${GITHUB_SHA::7}"
+          IFS=',' read -ra SVCS <<< "${{ steps.changes.outputs.changed }}"
+          for svc in "${SVCS[@]}"; do
+            DOCKER_PATH="Project-01/$svc"
+            if [ -f "$DOCKER_PATH/Dockerfile" ]; then
+              IMAGE="${{ vars.DOCKERHUB_USERNAME }}/$svc:${GITHUB_SHA::7}"
               echo "🚀 Building and pushing $IMAGE"
-              docker build -t $IMAGE $svc
+              docker build -t $IMAGE $DOCKER_PATH
               docker push $IMAGE
 
               # Update Helm values.yaml if chart exists
-              if [ -f "helm-charts/$svc/values.yaml" ]; then
-                sed -i "s|repository:.*|repository: ${{ secrets.DOCKER_USERNAME }}/$svc|g" helm-charts/$svc/values.yaml
-                sed -i "s|tag:.*|tag: ${GITHUB_SHA::7}|g" helm-charts/$svc/values.yaml
+              HELM_VALUES="helm-charts/$svc/values.yaml"
+              if [ -f "$HELM_VALUES" ]; then
+                sed -i "s|repository:.*|repository: ${{ vars.DOCKERHUB_USERNAME }}/$svc|g" "$HELM_VALUES"
+                sed -i "s|tag:.*|tag: ${GITHUB_SHA::7}|g" "$HELM_VALUES"
               fi
             fi
           done
