@@ -38,7 +38,7 @@ jobs:
         run: |
           for svc in ${{ steps.changes.outputs.changed }}; do
             if [ -f "$svc/Dockerfile" ]; then
-              IMAGE="${{ secrets.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/$svc:${GITHUB_SHA::7}"
+              IMAGE="${{ secrets.DOCKER_USERNAME }}/$svc:${GITHUB_SHA::7}"
               echo "🚀 Building and pushing $IMAGE"
               docker build -t $IMAGE $svc
               docker push $IMAGE
