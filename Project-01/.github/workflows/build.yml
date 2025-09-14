@@ -1,7 +1,5 @@
 
-name: CI/CD Microservices
-##
-
+name: CI/CD Microservices Pipeline
 on:
   push:
     branches:
